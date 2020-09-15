@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+require 'text_analyzer'
+
+def main(argv)
+end
+
+main(ARGV) if __FILE__ == $0
