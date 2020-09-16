@@ -22,7 +22,8 @@ module TextAnalyzer
         end
       end
 
-      get_most_common(results)
+      top_results = get_most_common(results)
+      display(top_results)
     end
 
     def analyze(input)
@@ -51,7 +52,15 @@ module TextAnalyzer
     end
 
     def get_most_common(result)
-      result.sort_by(&:last).reverse!.take(RANK_CUTOFF).compact
+      result.sort_by(&:last).reverse!.take(RANK_CUTOFF).compact.to_h.invert
+    end
+
+    def display(results)
+      output = results.map do |count, sequence|
+        "#{count} - #{sequence.join(" ")}"
+      end.join(", ")
+
+      STDOUT.write(output)
     end
   end
 end

@@ -7,7 +7,7 @@ unless ARGV.map { |f| File.exist?(f) }.all?
   STDOUT.write <<~EOS
   Usage:
 
-  This is a utility to output a list of the 100 most common three-word
+  This is a utility to output a list of the 100 most common #{TextAnalyzer::Analyzer::SEQUENCE_SIZE}-word
   sequences in one or more texts.
 
   $ bin/text_analyzer file1.txt file2.txt
@@ -20,4 +20,4 @@ unless ARGV.map { |f| File.exist?(f) }.all?
 end
 
 input = ARGV.any? ? ARGV : STDIN
-TextAnalyzer::Analyzer.new(input).run
+result = TextAnalyzer::Analyzer.new(input).run
