@@ -11,4 +11,6 @@ require "text_analyzer"
 # Pry.start
 
 require "irb"
+require "pry-byebug"
+
 IRB.start(__FILE__)

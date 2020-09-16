@@ -20,4 +20,4 @@ unless ARGV.map { |f| File.exist?(f) }.all?
 end
 
 input = ARGV.any? ? ARGV : STDIN
-TextAnalyzer::Analyzer.run(input)
+TextAnalyzer::Analyzer.new(input).run
