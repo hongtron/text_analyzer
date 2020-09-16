@@ -9,10 +9,6 @@ RSpec.describe "bin/text_analyzer" do
     expect(%x[echo "yes hi hello" | DEBUG=true bin/text_analyzer]).to match("[DEBUG] Processing from STDIN")
   end
 
-  it "displays help text if no input is provided" do
-    expect(%x[bin/text_analyzer]).to match("Usage:")
-  end
-
   it "displays help text if passed args that are not filenames" do
     expect(%x[bin/text_analyzer --textual-healing]).to match("Usage:")
     expect(%x[bin/text_analyzer fhqwhgads]).to match("Usage:")
