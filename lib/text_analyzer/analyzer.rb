@@ -11,15 +11,13 @@ module TextAnalyzer
       results = if @input == STDIN
         analyze(@input)
       elsif @input.length == 1
-        analyze(@input.first)
+        analyze(File.new(@input.first))
       else
         individual_results = @input.map { |path| File.new(path) }
           .map { |file| Thread.new { Thread.current[:result] = analyze(file) } }
           .each(&:join)
           .map { |t| t[:result] }
-        combined_results = individual_results.reduce(Hash.new(0)) do |acc, result|
-          acc.merge(result) { |seq, total_count, current_count| total_count + current_count }
-        end
+        combine_results(individual_results)
       end
 
       top_results = get_most_common(results)
@@ -27,17 +25,23 @@ module TextAnalyzer
     end
 
     def analyze(input)
-      TextAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input.path}")
+      TextAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input}")
       result = Hash.new(0)
       lookback_tokens = []
       input.each_line do |line|
         normalize!(line)
-        tokens = lookback_tokens + line.split(' ')
+        tokens = lookback_tokens + line.split(" ")
         sequences(tokens).each { |seq| result[seq] += 1 }
         lookback_tokens = tokens.last(SEQUENCE_SIZE - 1)
       end
 
       result
+    end
+
+    def combine_results(results)
+      results.reduce(Hash.new(0)) do |acc, result|
+        acc.merge(result) { |seq, total_count, current_count| total_count + current_count }
+      end
     end
 
     def normalize!(text)
