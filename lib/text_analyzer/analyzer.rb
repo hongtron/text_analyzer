@@ -25,7 +25,7 @@ module TextAnalyzer
     end
 
     def analyze(input)
-      TextAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input}")
+      TextAnalyzer::LOGGER.debug("Analyzing #{input == STDIN ? "STDIN" : input.path}")
       result = Hash.new(0)
       lookback_tokens = []
       input.each_line do |line|
@@ -64,7 +64,7 @@ module TextAnalyzer
         "#{count} - #{sequence.join(" ")}"
       end.join(", ")
 
-      STDOUT.write(output)
+      STDOUT.puts(output)
     end
   end
 end

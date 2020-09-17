@@ -1,22 +1,22 @@
 RSpec.describe TextAnalyzer::Analyzer do
   let(:input) { "some_file.txt" }
-  let(:thread) { instance_double(Thread) }
   let(:analyzer) { TextAnalyzer::Analyzer.new([input]) }
+  let(:file) { instance_double(File) }
+
+  before(:each) do
+    allow(File).to receive(:new).with(input).and_return(file)
+    allow(file).to receive(:path).and_return(input)
+  end
 
   describe "#run" do
-    let(:file) { instance_double(File) }
-
     before(:each) do
       stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 3)
       stub_const("TextAnalyzer::Analyzer::RANK_CUTOFF", 1)
-      allow(File).to receive(:new).with(input).and_return(file)
       allow(file).to receive(:each_line)
         .and_yield("some! GREAT ..contents")
         .and_yield("(more) good werds")
         .and_yield("s,o,m,e g.r.e.a.t conTENTS")
-      allow(thread).to receive(:join)
-      allow(thread).to receive(:[]).with(:result).and_return({})
-      allow(STDOUT).to receive(:write)
+      allow(STDOUT).to receive(:puts)
     end
 
     it "analyzes STDIN without starting a new thread" do
@@ -31,12 +31,18 @@ RSpec.describe TextAnalyzer::Analyzer do
     end
 
     it "outputs the most common sequences of length SEQUENCE_SIZE in the input" do
-      expect(STDOUT).to receive(:write).with("2 - some great contents")
+      expect(STDOUT).to receive(:puts).with("2 - some great contents")
       analyzer.run
     end
 
     context "with multiple input files" do
       let(:multi_file_analyzer) { TextAnalyzer::Analyzer.new([input, input]) }
+      let(:thread) { instance_double(Thread) }
+
+      before(:each) do
+        allow(thread).to receive(:join)
+        allow(thread).to receive(:[]).with(:result).and_return({})
+      end
 
       it "analyzes each file in a new thread when given multiple input files" do
         expect(Thread).to receive(:new).and_return(thread).twice
@@ -48,34 +54,34 @@ RSpec.describe TextAnalyzer::Analyzer do
   describe "#analyze" do
     it "returns an empty result set if the input contains fewer than SEQUENCE_SIZE words" do
       stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 4)
-      allow(input).to receive(:each_line)
+      allow(file).to receive(:each_line)
         .and_yield(generate_word)
         .and_yield(generate_word)
         .and_yield(generate_word)
       analyzer = TextAnalyzer::Analyzer.new(input)
-      expect(analyzer.analyze(input).length).to eq(0)
+      expect(analyzer.analyze(file).length).to eq(0)
     end
 
     it "detects sequences of SEQUENCE_SIZE words across multiple lines" do
       stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 4)
-      allow(input).to receive(:each_line)
+      allow(file).to receive(:each_line)
         .and_yield(generate_word)
         .and_yield(generate_word)
         .and_yield(generate_word)
         .and_yield(generate_word)
       analyzer = TextAnalyzer::Analyzer.new(input)
-      expect(analyzer.analyze(input).length).to eq(1)
+      expect(analyzer.analyze(file).length).to eq(1)
     end
 
     it "detects sequences of SEQUENCE_SIZE words across empty lines" do
       stub_const("TextAnalyzer::Analyzer::SEQUENCE_SIZE", 3)
-      allow(input).to receive(:each_line)
+      allow(file).to receive(:each_line)
         .and_yield(generate_word)
         .and_yield("")
         .and_yield(generate_word)
         .and_yield(generate_word)
       analyzer = TextAnalyzer::Analyzer.new(input)
-      expect(analyzer.analyze(input).length).to eq(1)
+      expect(analyzer.analyze(file).length).to eq(1)
     end
   end
 
