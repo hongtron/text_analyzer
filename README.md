@@ -6,6 +6,8 @@ A text analyzing program to satisfy the NewRelic code challenge.
 
 Bundler is required. If it is not installed, `gem install bundler`.
 
+`bin/setup`
+
 ## Usage
 
 `bin/text_analyzer file1.txt file2.txt`
