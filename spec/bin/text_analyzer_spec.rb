@@ -1,7 +1,6 @@
 RSpec.describe "bin/text_analyzer" do
   it "accepts arguments as a list of one or more file paths" do
-    project_root = File.expand_path("../../..", __FILE__)
-    out = %x[cd #{project_root} && DEBUG=true bin/text_analyzer README.md SPECIFICATION.md]
+    out = %x[DEBUG=true bin/text_analyzer README.md SPECIFICATION.md]
     expect(out).to match("Analyzing README.md")
     expect(out).to match("Analyzing SPECIFICATION.md")
   end
