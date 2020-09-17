@@ -39,6 +39,7 @@ module TextAnalyzer
     end
 
     def combine_results(results)
+      TextAnalyzer::LOGGER.debug("Combining #{results.length} sets of results")
       results.reduce(Hash.new(0)) do |acc, result|
         acc.merge(result) { |seq, total_count, current_count| total_count + current_count }
       end
