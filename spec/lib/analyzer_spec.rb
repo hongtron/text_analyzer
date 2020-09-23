@@ -86,10 +86,8 @@ RSpec.describe TextAnalyzer::Analyzer do
   end
 
   describe "#get_most_common" do
-    it "returns the top RANK_CUTOFF results keyed and ordered by count" do
-      stub_const("TextAnalyzer::Analyzer::RANK_CUTOFF", 3)
-
-      result = {
+    let(:result) do
+      {
         ["we", "were", "both"] => 2,
         ["young", "when", "i"] => 5,
         ["first", "saw", "you"] => 1,
@@ -97,14 +95,35 @@ RSpec.describe TextAnalyzer::Analyzer do
         ["eyes", "the", "flashback"] => 7,
         ["starts", "im", "standin"] => 6,
       }
+    end
 
-      top_3 = {
-        7 => ["eyes", "the", "flashback"],
-        6 => ["starts", "im", "standin"],
-        5 => ["young", "when", "i"],
-      }
+    before(:each) { stub_const("TextAnalyzer::Analyzer::RANK_CUTOFF", 3) }
 
-      expect(analyzer.get_most_common(result)).to eq(top_3)
+    context "with no sort order specified" do
+      it "returns the top RANK_CUTOFF results keyed and ordered by count in descending order" do
+
+        top_3 = {
+          7 => [["eyes", "the", "flashback"]],
+          6 => [["starts", "im", "standin"]],
+          5 => [["young", "when", "i"]],
+        }
+
+        expect(analyzer.get_most_common(result)).to eq(top_3)
+      end
+    end
+
+    context "with ascending sort order" do
+      it "returns the top RANK_CUTOFF results keyed and ordered by count in ascending order" do
+        allow(TextAnalyzer).to receive(:sort_order).and_return("ascending")
+
+        bottom_3 = {
+          1 => [["first", "saw", "you"]],
+          2 => [["we", "were", "both"]],
+          4 => [["i", "close", "my"]],
+        }
+
+        expect(analyzer.get_most_common(result)).to eq(bottom_3)
+      end
     end
   end
 

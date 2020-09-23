@@ -57,12 +57,28 @@ module TextAnalyzer
     end
 
     def get_most_common(result)
-      result.sort_by(&:last).reverse!.take(RANK_CUTOFF).compact.to_h.invert
+      ordered_results = result.sort_by(&:last) # ascending
+      if TextAnalyzer.sort_order == "descending"
+        ordered_results.reverse!
+      end
+
+      _invert_results(ordered_results.take(RANK_CUTOFF).compact.to_h)
+    end
+
+    def _invert_results(results)
+      inverted = Hash.new { |h, k| h[k] = [] }
+      results.each do |seq, count|
+        inverted[count] << seq
+      end
+
+      inverted
     end
 
     def display(results)
-      output = results.map do |count, sequence|
-        "#{count} - #{sequence.join(" ")}"
+      output = results.map do |count, sequences|
+        sequences.map do |sequence|
+          "#{count} - #{sequence.join(" ")}"
+        end.join(", ")
       end.join(", ")
 
       STDOUT.puts(output)
