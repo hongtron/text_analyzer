@@ -13,7 +13,7 @@ module TextAnalyzer
     LOGGER.level = Logger::WARN
 
     def sort_order
-      order = ENV["SORT_ORDER"]
+      order = ENV["SORT_ORDER"] || DEFAULT_SORT_ORDER
       if SORT_ORDERS.include?(order)
         order
       else
