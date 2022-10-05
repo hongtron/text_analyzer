@@ -1,6 +1,6 @@
 # TextAnalyzer
 
-A text analyzing program to satisfy the NewRelic code challenge.
+A text analyzing program.
 
 ## Setup
 
